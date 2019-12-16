@@ -163,17 +163,17 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
     socket.on('reject', function(data) {
       io.emit('reject', data)
-      console.log('user reject ' + data.id)
+      console.log(data.player + ' rejects ' + data.asker)
     })
 
     socket.on('play', function(data) {
       io.emit('play', data)
-      console.log('user play ' + data.id)
+      console.log(data.asker + ' plays with ' + data.player)
     })
 
     socket.on('invite', function(data) {
       io.emit('invite', data)
-      console.log('user invite ' + data.id)
+      console.log(data.asker + ' invited ' + data.player)
     })
 
     socket.on('capitulate', function(data) {
