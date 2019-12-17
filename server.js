@@ -166,9 +166,9 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       console.log(data.player + ' rejects ' + data.asker)
     })
 
-    socket.on('arrived', function(data) {
-      io.emit('arrived', data)
-      console.log(data.code + ' has gone')
+    socket.on('resume', function(data) {
+      io.emit('resume', data)
+      console.log(data.code + ' has resume')
     })
 
     socket.on('gone', function(data) {
