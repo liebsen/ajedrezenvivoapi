@@ -12,7 +12,9 @@ var expressLayouts = require('express-ejs-layouts')
 var bodyParser = require('body-parser')
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var gamesort = {date:-1}
-var onlineplayers=[]
+var onlineplayers = []
+var clocks = {}
+var movecompensation = 5
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
@@ -158,42 +160,34 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
     socket.on('join', function(id) {
       socket.join(id)
-      console.log('user joined room: ' + id)
     })
 
     socket.on('reject', function(data) {
       io.emit('reject', data)
-      console.log(data.player + ' rejects ' + data.asker)
     })
 
     socket.on('resume', function(data) {
       io.emit('resume', data)
-      console.log(data.code + ' has resume')
     })
 
     socket.on('gone', function(data) {
       io.emit('gone', data)
-      console.log(data.code + ' has gone')
     })
 
     socket.on('play', function(data) {
       io.emit('play', data)
-      console.log(data.asker + ' plays with ' + data.player)
     })
 
     socket.on('invite', function(data) {
       io.emit('invite', data)
-      console.log(data.asker + ' invited ' + data.player)
     })
 
     socket.on('capitulate', function(data) {
       io.emit('capitulate', data)
-      console.log('user capitulate ' + data.id)
     })
 
     socket.on('askfordraw', function(data) {
       io.emit('askfordraw', data)
-      console.log('user askfordraw ' + data.id)
     })
 
     socket.on('preferences', function(data) {
@@ -209,11 +203,9 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         oldnick: data.oldnick
       }
       io.emit('nick', data)
-      console.log('user nick ' + JSON.stringify(data))
     })
 
     socket.on('lobby', function(player) {
-      console.log('player available? ' + player.available);
       if(player.available === false) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
@@ -225,7 +217,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         onlineplayers.push(player.code)
       }
       io.emit('players', onlineplayers)
-      console.log('user joins: ' + player.code)
     })
 
     socket.on('leave', function(player) {
@@ -236,27 +227,23 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         }
       }
       io.emit('players', onlineplayers)
-      console.log('user leaves: ' + player.code)
     })
 
     socket.on('undo', function(data) { //undo emitter
-      console.log('user undo ' + data.id)
       io.to(data.id).emit('undo', data)
     })
 
     socket.on('chat', function(data) { //move object emitter
-      //console.log('chat ' + data.line)
       io.to(data.id).emit('chat', data)
     })
 
     socket.on('move', function(move) { //move object emitter
       var item = move
       var id = move.id
+      move[move.turn + 'time'] += movecompensation
       item.updatedAt = moment().utc().format()
       delete item.id 
       var ObjectId = require('mongodb').ObjectId
-      console.log("updating " + id)
-      console.log(item)
       return db.collection('games').findOneAndUpdate(
       {
         '_id': new ObjectId(id)
@@ -264,7 +251,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       {
         "$set": item
       },{ new: true }).then(function(doc){
-        console.log(id + '- user moved: ' + JSON.stringify(move));
         io.to(id).emit('move', move)
       })
     })
@@ -284,7 +270,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       {
         "$set": item
       },{ new: true }).then(function(doc){
-        console.log(item.id + '- data updated: ' + JSON.stringify(data))
         io.to(id).emit('data', data)
       })
     })
@@ -293,6 +278,5 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
   var server = http.listen(process.env.PORT, function () { //run http and web socket server
     var host = server.address().address
     var port = server.address().port
-    console.log('Server listening at address ' + host + ', port ' + port)
   })
 })
