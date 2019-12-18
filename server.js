@@ -156,9 +156,9 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
   io.on('connection', function(socket){ //join room on connect
 
-    socket.on('join', function(room) {
-      socket.join(room)
-      console.log('user joined room: ' + room)
+    socket.on('join', function(id) {
+      socket.join(id)
+      console.log('user joined room: ' + id)
     })
 
     socket.on('reject', function(data) {
@@ -265,7 +265,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         console.log(id + '- user moved: ' + JSON.stringify(move));
-        io.emit('move', move)
+        io.to(id).emit('move', move)
       })
     })
 
@@ -285,7 +285,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         console.log(item.id + '- data updated: ' + JSON.stringify(data))
-        io.emit('data', data)
+        io.to(id).emit('data', data)
       })
     })
   })
