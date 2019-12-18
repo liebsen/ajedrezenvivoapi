@@ -239,14 +239,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       console.log('user leaves: ' + player.code)
     })
 
-    socket.on('undo', function() { //undo emitter
-      console.log('user undo')
-      io.emit('undo')
+    socket.on('undo', function(data) { //undo emitter
+      console.log('user undo ' + data.id)
+      io.to(data.id).emit('undo', data)
     })
 
     socket.on('chat', function(data) { //move object emitter
-      console.log('chat')
-      io.emit('chat', data)
+      //console.log('chat ' + data.line)
+      io.to(data.id).emit('chat', data)
     })
 
     socket.on('move', function(move) { //move object emitter
