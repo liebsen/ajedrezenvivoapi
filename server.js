@@ -170,6 +170,10 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('resume', data)
     })
 
+    socket.on('start', function(data) {
+      io.emit('start', data)
+    })
+
     socket.on('gone', function(data) {
       io.emit('gone', data)
     })
