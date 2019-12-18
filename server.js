@@ -14,7 +14,7 @@ var onlinewhen = moment().utc().subtract(10, 'minutes')
 var gamesort = {date:-1}
 var onlineplayers = []
 var clocks = {}
-var movecompensation = 5
+var movecompensation = 2
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
@@ -244,7 +244,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('move', function(move) { //move object emitter
       var item = move
       var id = move.id
-      //move[move.turn + 'time'] += movecompensation
+      move[move.turn + 'time'] += movecompensation
       item.updatedAt = moment().utc().format()
       delete item.id 
       var ObjectId = require('mongodb').ObjectId
