@@ -162,6 +162,10 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       socket.join(id)
     })
 
+    socket.on('leave', function(id) {
+      socket.leave(id)
+    })
+
     socket.on('reject', function(data) {
       io.emit('reject', data)
     })
@@ -209,7 +213,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('nick', data)
     })
 
-    socket.on('lobby', function(player) {
+    socket.on('lobby_join', function(player) {
       if(player.available === false) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
@@ -223,7 +227,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('players', onlineplayers)
     })
 
-    socket.on('leave', function(player) {
+    socket.on('lobby_leave', function(player) {
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i] === player.code){
