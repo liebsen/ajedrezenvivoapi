@@ -244,7 +244,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('move', function(move) { //move object emitter
       var item = move
       var id = move.id
-      //move[move.turn + 'time'] += movecompensation
+      var t = move.turn === 'w' ? 'b' : 'w'
+      move[t + 'time'] += movecompensation
       item.updatedAt = moment().utc().format()
       delete item.id 
       var ObjectId = require('mongodb').ObjectId
