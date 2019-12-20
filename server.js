@@ -173,14 +173,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('resume', data)
     })
 
-    socket.on('start', function(data) {
-      io.emit('start', data)
-    })
-
-    socket.on('gone', function(data) {
-      io.emit('gone', data)
-    })
-
     socket.on('play', function(data) {
       io.emit('play', data)
     })
@@ -236,6 +228,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('players', onlineplayers)
     })
 
+    socket.on('start', function(data) {
+      io.to(data.id).emit('start', data)
+    })
+
+    socket.on('gone', function(data) {
+      io.to(data.id).emit('gone', data)
+    })
+    
     socket.on('undo', function(data) { //undo emitter
       io.to(data.id).emit('undo', data)
     })
