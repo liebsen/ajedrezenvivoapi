@@ -181,14 +181,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('invite', data)
     })
 
-    socket.on('capitulate', function(data) {
-      io.emit('capitulate', data)
-    })
-
-    socket.on('askfordraw', function(data) {
-      io.emit('askfordraw', data)
-    })
-
     socket.on('preferences', function(data) {
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
@@ -230,6 +222,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
     socket.on('start', function(data) {
       io.to(data.id).emit('start', data)
+    })
+
+    socket.on('capitulate', function(data) {
+      io.to(data.id).emit('capitulate', data)
+    })
+
+    socket.on('askfordraw', function(data) {
+      io.to(data.id).emit('askfordraw', data)
     })
 
     socket.on('gone', function(data) {
