@@ -13,7 +13,7 @@ var bodyParser = require('body-parser')
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var gamesort = {date:-1}
 var onlineplayers = []
-var movecompensation = 3
+var movecompensation = 2
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
