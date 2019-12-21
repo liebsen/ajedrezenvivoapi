@@ -65,7 +65,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       minutes: req.body.minutes,
       date:moment().utc().format('YYYY.MM.DD'),
       event: 'Juego online',
-      views: 1
+      broadcast: true,
+      views: 0
     }
 
     db.collection('games').insertOne(doc,function (err, response) {
