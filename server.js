@@ -160,8 +160,10 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
   io.on('connection', function(socket){ //join room on connect
 
     socket.on('disconnect', function() {
+      console.log("disconnect")
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].socket === socket.id){
+          console.log(onlineplayers[i].code + " just disconnected")
           onlineplayers.splice(i, 1)
         }
       }
