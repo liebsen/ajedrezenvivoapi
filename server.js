@@ -14,6 +14,7 @@ var onlinewhen = moment().utc().subtract(10, 'minutes')
 var gamesort = {date:-1}
 var onlineplayers = []
 var movecompensation = 2
+var allClients = []
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
@@ -158,6 +159,15 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
   io.on('connection', function(socket){ //join room on connect
 
+    socket.on('disconnect', function() {
+      for(var i = 0; i < onlineplayers.length; i++ ){
+        if(onlineplayers[i].socket === socket.id){
+          onlineplayers.splice(i, 1)
+        }
+      }
+      io.emit('players', onlineplayers)
+    })
+
     socket.on('join', function(id) {
       socket.join(id)
     })
@@ -201,12 +211,15 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       if(player.available === false) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i] === player.code){
+        if(onlineplayers[i].code === player.code){
           exists = true
         }
       }
       if(exists === false){
-        onlineplayers.push(player.code)
+        onlineplayers.push({
+          code: player.code,
+          socket:socket.id
+        })
       }
       io.emit('players', onlineplayers)
     })
@@ -214,7 +227,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('lobby_leave', function(player) {
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i] === player.code){
+        if(onlineplayers[i].code === player.code){
           onlineplayers.splice(i, 1)
         }
       }
