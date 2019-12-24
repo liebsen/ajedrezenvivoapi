@@ -210,7 +210,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('lobby_join', function(player) {
-      if(player.available === false) return
+      if(player.available === false || !player.code.length) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === player.code){
@@ -227,6 +227,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('lobby_leave', function(player) {
+      if(!player.code.length) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === player.code){
