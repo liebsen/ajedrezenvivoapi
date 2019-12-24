@@ -1,7 +1,6 @@
 const fs = require('fs')
 var express = require('express');
 var path = require('path');
-//var sslredirect = require('./node-heroku-ssl-redirect');
 var app = express();
 var cors = require('cors');
 var http = require('http').Server(app);
@@ -16,7 +15,7 @@ var onlineplayers = []
 var movecompensation = 2
 var allClients = []
 var allowedOrigins = [
-  'http://localhost:4000',
+  'http://localhost:8080',
   'https://localhost:8080',
   'https://ajedrezenvivo.net',
   'https://ajedrezenvivo.herokuapp.com'
