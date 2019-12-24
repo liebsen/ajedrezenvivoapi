@@ -1,6 +1,7 @@
 const fs = require('fs')
 var express = require('express');
 var path = require('path');
+//var sslredirect = require('./node-heroku-ssl-redirect');
 var app = express();
 var cors = require('cors');
 var http = require('http').Server(app);
@@ -15,7 +16,7 @@ var onlineplayers = []
 var movecompensation = 2
 var allClients = []
 var allowedOrigins = [
-  'http://localhost:8080',
+  'http://localhost:4000',
   'https://localhost:8080',
   'https://ajedrezenvivo.net',
   'https://ajedrezenvivo.herokuapp.com'
@@ -157,6 +158,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
   })
 
   io.on('connection', function(socket){ //join room on connect
+
     socket.on('disconnect', function() {
       console.log("disconnect")
       for(var i = 0; i < onlineplayers.length; i++ ){
@@ -195,16 +197,20 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('preferences', function(data) {
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].code === data.code && onlineplayers[i].socket != socket.id){
+        if(onlineplayers[i].code === data.nick && onlineplayers[i].socket != socket.id){
           exists = true
         }
       }
-      data.exists = exists
-      io.emit('code', data)
+      var data = {
+        exists: exists,
+        nick: data.nick,
+        oldnick: data.oldnick
+      }
+      io.emit('nick', data)
     })
 
     socket.on('lobby_join', function(player) {
-      if(player.available === false) return
+      if(player.available === false || !player.code.length) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === player.code){
@@ -212,7 +218,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         }
       }
       if(exists === false){
-        console.log(player.code + " joins")
         onlineplayers.push({
           code: player.code,
           socket:socket.id
@@ -222,9 +227,10 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('lobby_leave', function(player) {
+      if(!player.code.length) return
+      var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === player.code){
-          console.log(player.code + " leaves")
           onlineplayers.splice(i, 1)
         }
       }
