@@ -209,7 +209,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('lobby_join', function(player) {
-      if(player.available === false || !player.code.length) return
+      if(player.available === false || !player.code) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === player.code){
