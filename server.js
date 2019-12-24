@@ -196,12 +196,12 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('preferences', function(data) {
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].code === data.nick && onlineplayers[i].socket != socket.id){
+        if(onlineplayers[i].code === data.code && onlineplayers[i].socket != socket.id){
           exists = true
         }
       }
       data.exists = exists
-      io.emit('nick', data)
+      io.emit('code', data)
     })
 
     socket.on('lobby_join', function(player) {
