@@ -218,6 +218,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         }
       }
       if(exists === false){
+        console.log(player.code + " joins")
         onlineplayers.push({
           code: player.code,
           socket:socket.id
@@ -231,6 +232,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === player.code){
+          console.log(player.code + " leaves")
           onlineplayers.splice(i, 1)
         }
       }
