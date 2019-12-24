@@ -200,12 +200,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
           exists = true
         }
       }
-      var data = {
-        exists: exists,
-        nick: data.nick,
-        oldnick: data.oldnick,
-        available:data.available
-      }
+      data.exists = exists
       io.emit('nick', data)
     })
 
