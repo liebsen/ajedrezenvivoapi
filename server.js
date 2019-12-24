@@ -157,7 +157,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
   })
 
   io.on('connection', function(socket){ //join room on connect
-
     socket.on('disconnect', function() {
       console.log("disconnect")
       for(var i = 0; i < onlineplayers.length; i++ ){
@@ -205,10 +204,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('lobby_join', function(player) {
-      console.log('lobby_join')
-      console.log(player.code)
-      console.log(JSON.stringify(player))
-
       if(player.available === false) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
@@ -216,10 +211,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
           exists = true
         }
       }
-
-      console.log(exists)
-      console.log(onlineplayers)
-      console.log("--------")
       if(exists === false){
         console.log(player.code + " joins")
         onlineplayers.push({
@@ -231,9 +222,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('lobby_leave', function(player) {
-      console.log('lobby_join')
-      console.log(player.code)
-      console.log(JSON.stringify(player))
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === player.code){
           console.log(player.code + " leaves")
