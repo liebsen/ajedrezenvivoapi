@@ -198,12 +198,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       var exists = false
       console.log("+ preferences")
       console.log(JSON.stringify(onlineplayers))
+      console.log(data)
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === data.nick && onlineplayers[i].socket != socket.id){
           exists = true
         }
       }
       data.exists = exists
+      console.log(data)
       io.emit('player', data)
     })
 
