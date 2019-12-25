@@ -196,6 +196,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
     socket.on('preferences', function(data) {
       var exists = false
+      console.log("+ preferences")
+      console.log(JSON.stringify(onlineplayers))
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === data.nick && onlineplayers[i].socket != socket.id){
           exists = true
@@ -214,6 +216,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         }
       }
       if(exists === false){
+        console.log("+ lobby_join")
+        console.log(data.code + " joins")
         onlineplayers.push({
           code: data.code,
           socket:socket.id
@@ -225,6 +229,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('lobby_leave', function(data) {
       for(var i = 0; i < onlineplayers.length; i++ ){
         if(onlineplayers[i].code === data.code){
+          console.log("+ lobby_leave")
+          console.log(data.code + " leaves")
           onlineplayers.splice(i, 1)
         }
       }
