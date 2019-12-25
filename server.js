@@ -205,6 +205,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         }
       }
       data.exists = exists
+      data.id = socket.id
       console.log(data)
       io.emit('player', data)
     })
