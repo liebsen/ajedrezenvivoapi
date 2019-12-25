@@ -202,7 +202,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         }
       }
       data.exists = exists
-      io.emit('nick', data)
+      io.emit('player', data)
     })
 
     socket.on('lobby_join', function(data) {
