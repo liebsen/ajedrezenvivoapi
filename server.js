@@ -201,36 +201,30 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
           exists = true
         }
       }
-      var data = {
-        exists: exists,
-        nick: data.nick,
-        oldnick: data.oldnick
-      }
+      data.exists = exists
       io.emit('nick', data)
     })
 
-    socket.on('lobby_join', function(player) {
-      if(player.available === false || !player.code.length) return
+    socket.on('lobby_join', function(data) {
+      if(data.available === false) return
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].code === player.code){
+        if(onlineplayers[i].code === data.code){
           exists = true
         }
       }
       if(exists === false){
         onlineplayers.push({
-          code: player.code,
+          code: data.code,
           socket:socket.id
         })
       }
       io.emit('players', onlineplayers)
     })
 
-    socket.on('lobby_leave', function(player) {
-      if(!player.code.length) return
-      var exists = false
+    socket.on('lobby_leave', function(data) {
       for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].code === player.code){
+        if(onlineplayers[i].code === data.code){
           onlineplayers.splice(i, 1)
         }
       }
