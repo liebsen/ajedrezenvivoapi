@@ -194,6 +194,10 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('invite', data)
     })
 
+    socket.on('lobby_chat', function(data) { //move object emitter
+      io.emit('lobby_chat', data)
+    })
+
     socket.on('preferences', function(data) {
       var exists = false
       for(var i = 0; i < onlineplayers.length; i++ ){
