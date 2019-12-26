@@ -146,8 +146,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       $or.push({"pgn": {'$regex' : word, '$options' : 'i'}})
     })
 
-    db.collection('games').countDocuments({"$or": $or}, function(error, numOfDocs){
-      db.collection('games').find({"$or": $or})
+    db.collection('games').countDocuments({"pgn" : { $exists: true, $ne: null }, "$or": $or}, function(error, numOfDocs){
+      db.collection('games').find({"pgn" : { $exists: true, $ne: null }, "$or": $or})
         .sort(gamesort)
         .limit(limit)
         .skip(offset)
