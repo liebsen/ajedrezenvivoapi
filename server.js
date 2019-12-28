@@ -12,9 +12,9 @@ var expressLayouts = require('express-ejs-layouts')
 var bodyParser = require('body-parser')
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var gamesort = {date:-1}
-var onlineplayers = []
+var playersIdle = []
+var playersBusy = []
 var movecompensation = 2
-var allClients = []
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
@@ -161,13 +161,13 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
     socket.on('disconnect', function() {
       console.log("disconnect")
-      for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].socket === socket.id){
-          console.log(onlineplayers[i].code + " just disconnected")
-          onlineplayers.splice(i, 1)
+      for(var i = 0; i < playersIdle.length; i++ ){
+        if(playersIdle[i].socket === socket.id){
+          console.log(playersIdle[i].code + " just disconnected")
+          playersIdle.splice(i, 1)
         }
       }
-      io.emit('players', onlineplayers)
+      io.emit('players_idle', playersIdle)
     })
 
     socket.on('join', function(id) {
@@ -194,14 +194,22 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('invite', data)
     })
 
+    socket.on('invite_rematch', function(data) {
+      io.emit('invite_rematch', data)
+    })
+
+    socket.on('reject_rematch', function(data) {
+      io.emit('reject_rematch', data)
+    })
+
     socket.on('lobby_chat', function(data) { //move object emitter
       io.emit('lobby_chat', data)
     })
 
     socket.on('preferences', function(data) {
       var exists = false
-      for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].code === data.nick && onlineplayers[i].socket != socket.id){
+      for(var i = 0; i < playersIdle.length; i++ ){
+        if(playersIdle[i].code === data.nick && playersIdle[i].socket != socket.id){
           exists = true
         }
       }
@@ -212,29 +220,29 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('lobby_join', function(data) {
       if(data.available === false) return
       var exists = false
-      for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].code === data.code){
+      for(var i = 0; i < playersIdle.length; i++ ){
+        if(playersIdle[i].code === data.code){
           exists = true
         }
       }
       if(exists === false){
         console.log(data.code + " joins")
-        onlineplayers.push({
+        playersIdle.push({
           code: data.code,
           socket:socket.id
         })
       }
-      io.emit('players', onlineplayers)
+      io.emit('players_idle', playersIdle)
     })
 
     socket.on('lobby_leave', function(data) {
-      for(var i = 0; i < onlineplayers.length; i++ ){
-        if(onlineplayers[i].code === data.code){
+      for(var i = 0; i < playersIdle.length; i++ ){
+        if(playersIdle[i].code === data.code){
           console.log(data.code + " leaves")
-          onlineplayers.splice(i, 1)
+          playersIdle.splice(i, 1)
         }
       }
-      io.emit('players', onlineplayers)
+      io.emit('players_idle', playersIdle)
     })
 
     socket.on('start', function(data) {
@@ -247,6 +255,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
     socket.on('askfordraw', function(data) {
       io.to(data.id).emit('askfordraw', data)
+    })
+
+    socket.on('acceptdraw', function(data) {
+      io.to(data.id).emit('acceptdraw', data)
+    })
+
+    socket.on('rejectdraw', function(data) {
+      io.to(data.id).emit('rejectdraw', data)
     })
 
     socket.on('gone', function(data) {
