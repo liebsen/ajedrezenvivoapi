@@ -16,8 +16,8 @@ var playersIdle = []
 var playersBusy = []
 var movecompensation = 2
 var allowedOrigins = [
-  'http://localhost:4000',
-  'https://localhost:8080',
+  'https://0.0.0.0:8080',
+  'https://192.168.2.13:8080',
   'https://ajedrezenvivo.net',
   'https://ajedrezenvivo.herokuapp.com'
 ]
