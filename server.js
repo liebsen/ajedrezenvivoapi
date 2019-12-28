@@ -13,7 +13,7 @@ var bodyParser = require('body-parser')
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var gamesort = {date:-1}
 var playersIdle = []
-var playersBusy = []
+var matchesLive = []
 var movecompensation = 2
 var allowedOrigins = [
   'https://0.0.0.0:8080',
@@ -215,6 +215,29 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       }
       data.exists = exists
       io.emit('player', data)
+    })
+
+    socket.on('match_start', function(data) {
+      for(var i = 0; i < matchesLive.length; i++ ){
+        if(matchesLive[i].id === data.id){
+          exists = true
+        }
+      }
+      if(exists === false){
+        console.log(data.id + " match started")
+        matchesLive.push(data)
+      }
+      io.emit('match_live', matchesLive)
+    })
+
+    socket.on('match_end', function(data) {
+      for(var i = 0; i < matchesLive.length; i++ ){
+        if(matchesLive[i].id === data.id){
+          console.log(data.id + " match ends")
+          matchesLive.splice(i, 1)
+        }
+      }
+      io.emit('match_live', matchesLive)
     })
 
     socket.on('lobby_join', function(data) {
