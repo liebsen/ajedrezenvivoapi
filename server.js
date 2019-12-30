@@ -228,7 +228,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         console.log(data.id + " match started")
         matchesLive.push(data)
       }
-      io.emit('match_live', matchesLive)
+      io.emit('matches_live', matchesLive)
     })
 
     socket.on('match_end', function(data) {
@@ -238,7 +238,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
           matchesLive.splice(i, 1)
         }
       }
-      io.emit('match_live', matchesLive)
+      io.emit('matches_live', matchesLive)
     })
 
     socket.on('lobby_join', function(data) {
@@ -317,6 +317,21 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         io.to(id).emit('move', move)
+
+        for(var i = 0; i < matchesLive.length; i++ ){
+          if(matchesLive[i].id === id){
+            console.log(id + " match updated")
+            matchesLive[i].vscore = doc.vscore
+            matchesLive[i].pgn = doc.pgn
+            matchesLive[i].fen = doc.fen
+            matchesLive[i].from = doc.from
+            matchesLive[i].to = doc.to
+            matchesLive[i].wtime = doc.wtime
+            matchesLive[i].btime = doc.btime
+            matchesLive[i].result = doc.result
+            io.emit('match_live', matchesLive[i])
+          }
+        }        
       })
     })
 
