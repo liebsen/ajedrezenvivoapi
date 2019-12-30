@@ -220,7 +220,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('match_start', function(data) {
       var exists = false
       for(var i = 0; i < matchesLive.length; i++ ){
-        if(matchesLive[i].id === data.id){
+        if(matchesLive[i].id === data.id || matchesLive[i].white === data.white && matchesLive[i].black === data.black){
           exists = true
         }
       }
