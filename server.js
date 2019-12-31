@@ -321,7 +321,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         io.to(id).emit('move', data)
-        io.emit('match_live', data)
+
+        const match = {}
+        for(var i in data){
+          match[i] = data[i]
+        }
+        match.white = doc.value.white
+        match.black = doc.value.black
+        io.emit('match_live', match)
       })
     })
 
