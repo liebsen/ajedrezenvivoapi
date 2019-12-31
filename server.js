@@ -333,9 +333,12 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('data', function(data) { //data object emitter
-      var item = data
-      var id = data.id
+      var item = {}
+      for(var i in data){
+        item[i] = data[i]
+      }
 
+      var id = data.id
       item.updatedAt = moment().utc().format()      
       delete item.id 
 
@@ -348,6 +351,19 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         io.to(id).emit('data', data)
+
+        if(data.result){
+          for(var i = 0; i < matchesLive.length; i++ ){
+            if(matchesLive[i].id === data.id){
+              console.log(data.id + " match ends")
+              matchesLive.splice(i, 1)
+            }
+          }
+          
+          setTimeout(() => {
+            io.emit('matches_live', matchesLive)
+          },3000)
+        }
       })
     })
   })
