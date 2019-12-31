@@ -301,11 +301,11 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.to(data.id).emit('chat', data)
     })
 
-    socket.on('move', function(move) { //move object emitter
-      var item = move
+    socket.on('move', function(data) { //move object emitter
+      var item = data
       var id = move.id
-      var t = move.turn === 'w' ? 'b' : 'w'
-      move[t + 'time'] += movecompensation
+      var t = data.turn === 'w' ? 'b' : 'w'
+      data[t + 'time'] += movecompensation
       item.updatedAt = moment().utc().format()
       delete item.id 
       var ObjectId = require('mongodb').ObjectId
@@ -316,22 +316,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       {
         "$set": item
       },{ new: true }).then(function(doc){
-        io.to(id).emit('move', move)
-
-        for(var i = 0; i < matchesLive.length; i++ ){
-          if(matchesLive[i].id === id){
-            console.log(id + " match updated")
-            matchesLive[i].vscore = doc.vscore
-            matchesLive[i].pgn = doc.pgn
-            matchesLive[i].fen = doc.fen
-            matchesLive[i].from = doc.from
-            matchesLive[i].to = doc.to
-            matchesLive[i].wtime = doc.wtime
-            matchesLive[i].btime = doc.btime
-            matchesLive[i].result = doc.result
-            io.emit('match_live', matchesLive[i])
-          }
-        }        
+        io.to(id).emit('move', data)
+        io.emit('match_live', data)
       })
     })
 
