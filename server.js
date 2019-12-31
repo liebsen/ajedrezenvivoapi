@@ -317,7 +317,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         io.to(id).emit('move', data)
-        io.emit('match_live', data)
+
+        for(var i = 0; i < matchesLive.length; i++ ){
+          if(matchesLive[i].id === id){
+            console.log(id + " match updated")
+            console.log(doc)
+            io.emit('match_live', doc)
+          }
+        }        
       })
     })
 
