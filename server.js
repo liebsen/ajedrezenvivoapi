@@ -302,8 +302,11 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
 
     socket.on('move', function(data) { //move object emitter
-      var item = data
       var id = data.id
+      var item = {}
+      for(var i in data){
+        item[i] = data[i]
+      }
       var t = data.turn === 'w' ? 'b' : 'w'
       data[t + 'time'] += movecompensation
       item[t + 'time'] = data[t + 'time']
