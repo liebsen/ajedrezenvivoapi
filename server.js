@@ -303,7 +303,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
     socket.on('move', function(data) { //move object emitter
       var item = data
-      var id = move.id
+      var id = data.id
       var t = data.turn === 'w' ? 'b' : 'w'
       data[t + 'time'] += movecompensation
       item.updatedAt = moment().utc().format()
@@ -317,14 +317,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         io.to(id).emit('move', data)
-
-        for(var i = 0; i < matchesLive.length; i++ ){
-          if(matchesLive[i].id === id){
-            console.log(id + " match updated")
-            console.log(doc)
-            io.emit('match_live', doc)
-          }
-        }        
+        io.emit('match_live', data)
       })
     })
 
