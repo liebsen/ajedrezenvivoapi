@@ -306,6 +306,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       var id = data.id
       var t = data.turn === 'w' ? 'b' : 'w'
       data[t + 'time'] += movecompensation
+      item[t + 'time'] = data[t + 'time']
       item.updatedAt = moment().utc().format()
       delete item.id 
       var ObjectId = require('mongodb').ObjectId
@@ -317,8 +318,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         io.to(id).emit('move', data)
-        console.log(doc)
-        io.emit('match_live', doc)
+        io.emit('match_live', data)
       })
     })
 
