@@ -359,10 +359,10 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
               matchesLive.splice(i, 1)
             }
           }
-          
+
           setTimeout(() => {
             io.emit('matches_live', matchesLive)
-          },3000)
+          },10000)
         }
       })
     })
