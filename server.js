@@ -317,6 +317,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         "$set": item
       },{ new: true }).then(function(doc){
         io.to(id).emit('move', data)
+        console.log(doc)
         io.emit('match_live', doc)
       })
     })
