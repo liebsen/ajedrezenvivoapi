@@ -241,6 +241,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('matches_live', matchesLive)
     })
 
+    
+
     socket.on('lobby_join', function(data) {
       if(data.observe) return
       var exists = false
