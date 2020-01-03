@@ -241,10 +241,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       io.emit('matches_live', matchesLive)
     })
 
-    
-
     socket.on('lobby_join', function(data) {
-      if(data.observe) return
       var exists = false
       for(var i = 0; i < playersIdle.length; i++ ){
         if(playersIdle[i].code === data.code){
@@ -252,7 +249,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         }
       }
       if(exists === false){
-        console.log(data.code + " joins")
+        console.log(data.code + " joins. mode: " + (data.observe ? '👁️' : '👤'))
         playersIdle.push({
           code: data.code,
           socket:socket.id
