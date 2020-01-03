@@ -252,7 +252,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
         console.log(data.code + " joins. mode: " + (data.observe ? '👁️' : '👤'))
         playersIdle.push({
           code: data.code,
-          socket:socket.id
+          socket:socket.id,
+          observe: data.observe
         })
       }
       io.emit('players_idle', playersIdle)
