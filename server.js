@@ -167,7 +167,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
           playersIdle.splice(i, 1)
         }
       }
-      io.emit('players_idle', playersIdle)
+      io.emit('players', playersIdle)
     })
 
     socket.on('join', function(id) {
@@ -256,7 +256,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
           observe: data.observe
         })
       }
-      io.emit('players_idle', playersIdle)
+      io.emit('players', playersIdle)
     })
 
     socket.on('lobby_leave', function(data) {
@@ -266,7 +266,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
           playersIdle.splice(i, 1)
         }
       }
-      io.emit('players_idle', playersIdle)
+      io.emit('players', playersIdle)
     })
 
     socket.on('start', function(data) {
