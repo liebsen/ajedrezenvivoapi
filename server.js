@@ -16,8 +16,8 @@ var playersIdle = []
 var matchesLive = []
 var movecompensation = 2
 var allowedOrigins = [
-  'https://0.0.0.0:8080',
-  'https://192.168.2.13:8080',
+  'https://0.0.0.0:8000',
+  'https://192.168.2.13:8000',
   'https://ajedrezenvivo.net',
   'https://ajedrezenvivo.herokuapp.com'
 ]
