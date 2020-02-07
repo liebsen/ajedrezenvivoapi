@@ -304,11 +304,12 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     socket.on('move', function(data) { //move object emitter
       var id = data.id
       var item = {}
+      var compensation = data.compensation||0
       for(var i in data){
         item[i] = data[i]
       }
       var t = data.turn === 'w' ? 'b' : 'w'
-      data[t + 'time'] += movecompensation
+      data[t + 'time'] += compensation
       item[t + 'time'] = data[t + 'time']
       item.updatedAt = moment().utc().format()
       delete item.id 
