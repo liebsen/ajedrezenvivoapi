@@ -308,6 +308,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       for(var i in data){
         item[i] = data[i]
       }
+      console.log("compensation:" +compensation)
       var t = data.turn === 'w' ? 'b' : 'w'
       data[t + 'time'] += compensation
       item[t + 'time'] = data[t + 'time']
