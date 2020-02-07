@@ -64,6 +64,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       white: req.body.white,
       black: req.body.black,
       minutes: req.body.minutes,
+      compensation: req.body.compensation,
       date:moment().utc().format('YYYY.MM.DD'),
       event: 'Juego online',
       broadcast: true,
