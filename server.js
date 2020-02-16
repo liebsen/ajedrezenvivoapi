@@ -145,13 +145,15 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
+    $or.push({"pgn" : { $exists: true, $ne: null })
+
     if(query.length){
       $or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
       $or.push({"name": {'$regex' : query, '$options' : 'i'}})
     }
 
-    db.collection('eco_es').countDocuments({"pgn" : { $exists: true, $ne: null }, "$or": $or}, function(error, numOfDocs){
-      db.collection('eco_es').find({"pgn" : { $exists: true, $ne: null }, "$or": $or})
+    db.collection('eco_es').countDocuments("$or": $or}, function(error, numOfDocs){
+      db.collection('eco_es').find("$or": $or})
         .sort({name:1})
         .limit(limit)
         .skip(offset)
@@ -168,7 +170,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
-    
+
     query.split(' ').forEach((word) => {
       $or.push({"white": {'$regex' : word, '$options' : 'i'}})
       $or.push({"black": {'$regex' : word, '$options' : 'i'}})
