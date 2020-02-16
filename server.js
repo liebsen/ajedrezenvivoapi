@@ -49,7 +49,7 @@ app.use(express.static(path.join(__dirname, 'static')))
 app.set('view engine', 'ejs')
 app.use(expressLayouts)
 
-mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, database) {
+mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlParser: true }, function(err, database) {
   if(err) throw err
 
   const db = database.db(mongo_url.split('/').reverse()[0])
@@ -115,16 +115,6 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })   
   })
 
-  app.post('/online', function (req, res) { 
-    db.collection('games').find({
-      broadcast : true,
-      updatedAt: { $gte: onlinewhen.format() },
-      result: { $nin : ["0-1", "1-0", "1/2-1/2"] }
-    }).toArray(function(err,docs){
-      return res.json(docs)
-    })   
-  })
-
   app.post('/gamecount', function (req, res) { 
     db.collection('games').find(req.body).toArray(function(err,docs){
       return res.json(docs.length)
@@ -145,15 +135,16 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
-    $or.push({"pgn" : { $exists: true, $ne: null }})
+    let $find = {"pgn" : { $exists: true, $ne: null }}
 
     if(query.length){
-      $or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
-      $or.push({"name": {'$regex' : query, '$options' : 'i'}})
+      $find.$or = []
+      $find.$or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
+      $find.$or.push({"name": {'$regex' : query, '$options' : 'i'}})
     }
 
-    db.collection('eco_es').countDocuments({"$or": $or}, function(error, numOfDocs){
-      db.collection('eco_es').find({"$or": $or})
+    db.collection('eco_es').countDocuments($find, function(error, numOfDocs){
+      db.collection('eco_es').find($find)
         .sort({name:1})
         .limit(limit)
         .skip(offset)
@@ -164,24 +155,63 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
   })
 
   app.post('/search', function (req, res) { 
-    if(!req.body.query) return res.json({'error':'not_enough_params'})
     var $or = []
     , limit = parseInt(req.body.limit)||25
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
+    let $find = {"pgn" : { $exists: true, $ne: null }}
 
-    query.split(' ').forEach((word) => {
-      $or.push({"white": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"black": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"event": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"site": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"date": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"pgn": {'$regex' : word, '$options' : 'i'}})
+    if(query.length){
+      $find.$or = []
+      query.split(' ').forEach((word) => {
+        $find.$or.push({"white": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"black": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"event": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"site": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"date": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"pgn": {'$regex' : word, '$options' : 'i'}})
+      })
+    }
+
+    db.collection('games').countDocuments($find, function(error, numOfDocs){
+      db.collection('games').find($find)
+        .sort(gamesort)
+        .limit(limit)
+        .skip(offset)
+        .toArray(function(err,docs){
+          return res.json({games:docs,count:numOfDocs})
+        })   
     })
+  })
 
-    db.collection('games').countDocuments({"pgn" : { $exists: true, $ne: null }, "$or": $or}, function(error, numOfDocs){
-      db.collection('games').find({"pgn" : { $exists: true, $ne: null }, "$or": $or})
+  app.post('/online', function (req, res) { 
+
+    var $or = []
+    , limit = parseInt(req.body.limit)||25
+    , offset = parseInt(req.body.offset)||0
+    , query = unescape(req.body.query)
+
+    let $find = {
+      pgn : { $exists: true, $ne: null },
+      updatedAt: { $gte: onlinewhen.format() },
+      result: { $nin : ["0-1", "1-0", "1/2-1/2"] }
+    }
+
+    if(query.length){
+      $find.$or = []
+      query.split(' ').forEach((word) => {
+        $find.$or.push({"white": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"black": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"event": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"site": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"date": {'$regex' : word, '$options' : 'i'}})
+        $find.$or.push({"pgn": {'$regex' : word, '$options' : 'i'}})
+      })
+    }
+
+    db.collection('games').countDocuments($find, function(error, numOfDocs){
+      db.collection('games').find($find)
         .sort(gamesort)
         .limit(limit)
         .skip(offset)
@@ -403,7 +433,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
   })
 
-  var server = http.listen(process.env.PORT, function () { //run http and web socket server
+  var server = http.listen(process.env.PORT||4000, function () { //run http and web socket server
     var host = server.address().address
     var port = server.address().port
   })
