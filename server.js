@@ -152,8 +152,8 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
       $or.push({"name": {'$regex' : query, '$options' : 'i'}})
     }
 
-    db.collection('eco_es').countDocuments("$or": $or}, function(error, numOfDocs){
-      db.collection('eco_es').find("$or": $or})
+    db.collection('eco_es').countDocuments({"$or": $or}, function(error, numOfDocs){
+      db.collection('eco_es').find({"$or": $or})
         .sort({name:1})
         .limit(limit)
         .skip(offset)
