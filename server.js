@@ -140,14 +140,15 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
   })
 
   app.post('/eco/search', function (req, res) { 
-    if(!req.body.query) return res.json({'error':'not_enough_params'})
     var $or = []
     , limit = parseInt(req.body.limit)||25
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
-    $or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
-    $or.push({"name": {'$regex' : query, '$options' : 'i'}})
+    if(query.length){
+      $or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
+      $or.push({"name": {'$regex' : query, '$options' : 'i'}})
+    }
 
     db.collection('eco_es').countDocuments({"pgn" : { $exists: true, $ne: null }, "$or": $or}, function(error, numOfDocs){
       db.collection('eco_es').find({"pgn" : { $exists: true, $ne: null }, "$or": $or})
@@ -167,6 +168,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
+    
     query.split(' ').forEach((word) => {
       $or.push({"white": {'$regex' : word, '$options' : 'i'}})
       $or.push({"black": {'$regex' : word, '$options' : 'i'}})
