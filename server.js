@@ -131,11 +131,25 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
   })
 
-  app.post('/eco', function (req, res) { 
+  app.post('/eco/pgn', function (req, res) { 
     db.collection('eco_es').find({
-      pgn: new RegExp('^' + req.body.pgn, 'i')
+      pgn: new RegExp(req.body.pgn, 'i')
     }).toArray(function(err,docs){
       return res.json(docs[0])
+    })
+  })
+
+  app.post('/eco/name', function (req, res) { 
+    db.collection('eco_es').find({
+      name: new RegExp(req.body.pgn, 'i')
+    }).toArray(function(err,docs){
+      return res.json(docs[0])
+    })
+  })
+
+  app.post('/eco', function (req, res) { 
+    db.collection('eco_es').find({}).toArray(function(err,docs){
+      return res.json(docs)
     })
   })
 
