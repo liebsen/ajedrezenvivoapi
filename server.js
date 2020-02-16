@@ -131,6 +131,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
   })
 
+  app.post('/eco/find', function (req, res) { 
+    db.collection('games').find({
+      pgn: new RegExp('^' + req.body.pgn, 'i')
+    }).toArray(function(err,docs){
+      return res.json(docs[0])
+    })
+  })
+
   app.post('/search', function (req, res) { 
     if(!req.body.query) return res.json({'error':'not_enough_params'})
     var $or = []
