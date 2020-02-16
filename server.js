@@ -131,7 +131,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
   })
 
-  app.post('/eco/find', function (req, res) { 
+  app.post('/eco', function (req, res) { 
     db.collection('games').find({
       pgn: new RegExp('^' + req.body.pgn, 'i')
     }).toArray(function(err,docs){
