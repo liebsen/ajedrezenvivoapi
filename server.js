@@ -139,11 +139,14 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     })
   })
 
-  app.post('/eco/name', function (req, res) { 
+  app.post('/eco/search', function (req, res) { 
     db.collection('eco_es').find({
-      name: new RegExp(req.body.pgn, 'i')
+      $or : {
+        pgn: new RegExp(req.body.keyword, 'i'),
+        name: new RegExp(req.body.keyword, 'i')
+      }
     }).toArray(function(err,docs){
-      return res.json(docs[0])
+      return res.json(docs)
     })
   })
 
