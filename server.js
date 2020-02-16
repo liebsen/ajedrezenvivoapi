@@ -133,26 +133,30 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
 
   app.post('/eco/pgn', function (req, res) { 
     db.collection('eco_es').find({
-      pgn: new RegExp(req.body.pgn, 'i')
+      pgn: new RegExp('^' + req.body.pgn, 'i')
     }).toArray(function(err,docs){
       return res.json(docs[0])
     })
   })
 
   app.post('/eco/search', function (req, res) { 
-    db.collection('eco_es').find({
-      $or : {
-        pgn: new RegExp(req.body.keyword, 'i'),
-        name: new RegExp(req.body.keyword, 'i')
-      }
-    }).toArray(function(err,docs){
-      return res.json(docs)
-    })
-  })
+    if(!req.body.query) return res.json({'error':'not_enough_params'})
+    var $or = []
+    , limit = parseInt(req.body.limit)||25
+    , offset = parseInt(req.body.offset)||0
+    , query = unescape(req.body.query)
 
-  app.post('/eco', function (req, res) { 
-    db.collection('eco_es').find({}).toArray(function(err,docs){
-      return res.json(docs)
+    $or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
+    $or.push({"name": {'$regex' : query, '$options' : 'i'}})
+
+    db.collection('eco_es').countDocuments({"pgn" : { $exists: true, $ne: null }, "$or": $or}, function(error, numOfDocs){
+      db.collection('eco_es').find({"pgn" : { $exists: true, $ne: null }, "$or": $or})
+        .sort({name:1})
+        .limit(limit)
+        .skip(offset)
+        .toArray(function(err,docs){
+          return res.json({games:docs,count:numOfDocs})
+        })   
     })
   })
 
