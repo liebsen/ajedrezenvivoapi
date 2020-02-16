@@ -145,7 +145,7 @@ mongodb.MongoClient.connect(mongo_url, {useNewUrlParser: true }, function(err, d
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
-    $or.push({"pgn" : { $exists: true, $ne: null })
+    $or.push({"pgn" : { $exists: true, $ne: null }})
 
     if(query.length){
       $or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
