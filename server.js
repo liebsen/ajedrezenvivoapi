@@ -19,6 +19,7 @@ var allowedOrigins = [
   'http://0.0.0.0:8000',
   'http://192.168.2.13:8000',
   'https://ajedrezenvivo.net',
+  'https://biltz.herokuapp.com',
   'https://ajedrezenvivo.herokuapp.com'
 ]
 
