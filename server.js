@@ -130,40 +130,6 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     })
   })
 
-  app.post('/eco_es/pgn', function (req, res) { 
-    db.collection('eco_es').find({
-      pgn: new RegExp('^' + req.body.pgn, 'i')
-    }).toArray(function(err,docs){
-      return res.json(docs[0])
-    })
-  })
-
-  app.post('/eco_es/search', function (req, res) { 
-    var $or = []
-    , limit = parseInt(req.body.limit)||25
-    , offset = parseInt(req.body.offset)||0
-    , query = unescape(req.body.query)
-
-    let $find = {"pgn" : { $exists: true, $ne: null }}
-
-    if(query.length){
-      $find.$or = []
-      $find.$or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
-      $find.$or.push({"name": {'$regex' : query, '$options' : 'i'}})
-    }
-
-    db.collection('eco_es').countDocuments($find, function(error, numOfDocs){
-      db.collection('eco_es').find($find)
-        .sort({name:1})
-        .limit(limit)
-        .skip(offset)
-        .toArray(function(err,docs){
-          return res.json({games:docs,count:numOfDocs})
-        })   
-    })
-  })
-
-
   app.post('/eco/search', function (req, res) { 
     var $or = []
     , limit = parseInt(req.body.limit)||25
