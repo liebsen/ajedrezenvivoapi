@@ -141,6 +141,7 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     if(query.length){
       $find.$or = []
       $find.$or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
+      $find.$or.push({"eco": {'$regex' : query, '$options' : 'i'}})
       $find.$or.push({"name": {'$regex' : query, '$options' : 'i'}})
     }
 
