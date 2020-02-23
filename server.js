@@ -82,6 +82,29 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     })
   })
 
+  app.post('/save', function (req, res) { 
+
+    const doc = {      
+      white: req.body.white,
+      black: req.body.black,
+      event: 'Juego online',
+      site: 'AjedrezEV',
+      date: moment().format('YYYY.MM.DD HH:mm'),
+      orientation: req.body.orientation,
+      pgn: req.body.pgn,
+      views: 0
+    }
+
+    db.collection('games').insertOne(doc,function (err, response) {
+      if(err){ 
+        console.log(err)
+        return res.json({ status : 'error', message : 'Could not create game'})
+      } else {
+        return res.json({ status : 'success', id: response.ops[0]._id})
+      }
+    })
+  })
+
   app.post('/game', function (req, res) { 
     var ObjectId = require('mongodb').ObjectId
     db.collection('games').find({
@@ -122,17 +145,8 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     })
   })
 
-  app.post('/eco/pgn', function (req, res) { 
-    db.collection('eco').find({
-      pgn: new RegExp('^' + req.body.pgn, 'i')
-    }).toArray(function(err,docs){
-      return res.json(docs[0])
-    })
-  })
-
   app.post('/eco/search', function (req, res) { 
-    var $or = []
-    , limit = parseInt(req.body.limit)||25
+    var limit = parseInt(req.body.limit)||25
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
@@ -140,9 +154,12 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
 
     if(query.length){
       $find.$or = []
-      $find.$or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
-      $find.$or.push({"eco": {'$regex' : query, '$options' : 'i'}})
-      $find.$or.push({"name": {'$regex' : query, '$options' : 'i'}})
+      if(query.match(/^(\d)\. /g)) {
+        $find.$or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
+      } else {
+        $find.$or.push({"eco": {'$regex' : query, '$options' : 'i'}})
+        $find.$or.push({"name": {'$regex' : query, '$options' : 'i'}})
+      }
     }
 
     db.collection('eco').countDocuments($find, function(error, numOfDocs){
@@ -156,9 +173,22 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     })
   })
 
+  app.post('/eco/pgn', function (req, res) { 
+    db.collection('eco').find({
+      pgn: new RegExp('^' + req.body.pgn, 'i')
+    }).toArray(function(err,docs){
+      return res.json(docs[0])
+    })
+  })
+
+  app.post('/eco/pgn/random', function (req, res) { 
+    db.collection('eco').aggregate([{ $sample: { size: 1 } }]).toArray(function(err,docs){
+      return res.json(docs[0])
+    })
+  })
+
   app.post('/search', function (req, res) { 
-    var $or = []
-    , limit = parseInt(req.body.limit)||25
+    var limit = parseInt(req.body.limit)||25
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
 
@@ -166,14 +196,17 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
 
     if(query.length){
       $find.$or = []
-      query.split(' ').forEach((word) => {
-        $find.$or.push({"white": {'$regex' : word, '$options' : 'i'}})
-        $find.$or.push({"black": {'$regex' : word, '$options' : 'i'}})
-        $find.$or.push({"event": {'$regex' : word, '$options' : 'i'}})
-        $find.$or.push({"site": {'$regex' : word, '$options' : 'i'}})
-        $find.$or.push({"date": {'$regex' : word, '$options' : 'i'}})
-        $find.$or.push({"pgn": {'$regex' : word, '$options' : 'i'}})
-      })
+      if(query.match(/^(\d)\. /g)) {
+        $find.$or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
+      } else {
+        $find.$or.push({"date": {'$regex' : query, '$options' : 'i'}})        
+        query.split(' ').forEach((word) => {
+          $find.$or.push({"white": {'$regex' : word, '$options' : 'i'}})
+          $find.$or.push({"black": {'$regex' : word, '$options' : 'i'}})
+          $find.$or.push({"event": {'$regex' : word, '$options' : 'i'}})
+          $find.$or.push({"site": {'$regex' : word, '$options' : 'i'}})
+        }) 
+      }
     }
 
     db.collection('games').countDocuments($find, function(error, numOfDocs){
@@ -434,9 +467,9 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
       })
     })
   })
-
-  var server = http.listen(process.env.PORT||4000, function () { //run http and web socket server
-    var host = server.address().address
-    var port = server.address().port
+  
+  let port = process.env.PORT||4000
+  var server = http.listen(port, function () { //run http and web socket server
+    console.log(`Server running at http://localhost:${port}`)
   })
 })
