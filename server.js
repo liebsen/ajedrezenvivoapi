@@ -182,7 +182,18 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
   })
 
   app.post('/eco/pgn/random', function (req, res) { 
-    db.collection('eco').aggregate([{ $sample: { size: 1 } }]).toArray(function(err,docs){
+    db.collection('eco').aggregate([
+      {
+        "$redact": {
+            "$cond": [
+                { "$lt": [ { "$strLenCP": "$pgn" }, 20] },
+                "$$KEEP",
+                "$$PRUNE"
+            ]
+        }
+      },
+      { $sample: { size: 1 } }
+      ]).toArray(function(err,docs){
       return res.json(docs[0])
     })
   })
