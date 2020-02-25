@@ -173,6 +173,14 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     })
   })
 
+  app.post('/eco/search/pgn', function (req, res) { 
+    db.collection('eco').find({
+      pgn: req.body.pgn
+    }).toArray(function(err,docs){
+      return res.json(docs[0])
+    })
+  })
+
   app.post('/eco/pgn', function (req, res) { 
     db.collection('eco').find({
       pgn: new RegExp('^' + req.body.pgn, 'i')
