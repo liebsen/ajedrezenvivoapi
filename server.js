@@ -361,15 +361,16 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
 
     socket.on('lobby_join', function(data) {
       var exists = false
-      for(var i = 0; i < playersIdle.length; i++ ){
-        if(playersIdle[i].code === data.code){
+      for (var i = 0; i < playersIdle.length; i++) {
+        if (playersIdle[i].code === data.code){
           exists = true
         }
       }
-      if(exists === false){
+      if (exists === false){
         console.log(data.code + " joins. mode: " + (data.observe ? '👁️' : '👤'))
         playersIdle.push({
           code: data.code,
+          flag: data.flag,
           socket:socket.id,
           observe: data.observe
         })
