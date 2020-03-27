@@ -64,6 +64,8 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     const doc = {      
       white: req.body.white,
       black: req.body.black,
+      white_flag: req.body.white_flag,
+      black_flag: req.body.black_flag,
       minutes: req.body.minutes,
       compensation: req.body.compensation,
       date:moment().utc().format('YYYY.MM.DD'),
