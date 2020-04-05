@@ -89,6 +89,8 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     const doc = {      
       white: req.body.white,
       black: req.body.black,
+      whiteflag: req.body.whiteflag,
+      blackflag: req.body.blackflag,
       event: 'Juego online',
       site: 'AjedrezEV',
       date: moment().format('YYYY.MM.DD HH:mm'),
@@ -273,12 +275,11 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
         .skip(offset)
         .toArray(function(err,docs){
           return res.json({games:docs,count:numOfDocs})
-        })   
+        })
     })
   })
 
   io.on('connection', function(socket){ //join room on connect
-
     socket.on('disconnect', function() {
       console.log("disconnect")
       for(var i = 0; i < playersIdle.length; i++ ){
