@@ -85,7 +85,6 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
   })
 
   app.post('/save', function (req, res) { 
-
     const doc = {      
       white: req.body.white,
       black: req.body.black,
