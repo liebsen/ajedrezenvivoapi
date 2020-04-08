@@ -68,7 +68,7 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
       blackflag: req.body.blackflag,
       minutes: req.body.minutes,
       compensation: req.body.compensation,
-      date:moment().utc().format('YYYY.MM.DD'),
+      date:moment().utc().format('YYYY.MM.DD HH:MM'),
       event: 'Juego online',
       broadcast: true,
       views: 0
