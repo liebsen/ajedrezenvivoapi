@@ -85,12 +85,10 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
   })
 
   app.post('/save', function (req, res) { 
+
     const doc = {      
       white: req.body.white,
       black: req.body.black,
-      whiteflag: req.body.whiteflag,
-      blackflag: req.body.blackflag,
-      result: req.body.result,
       event: 'Juego online',
       site: 'AjedrezEV',
       date: moment().format('YYYY.MM.DD HH:mm'),
@@ -214,21 +212,26 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     var limit = parseInt(req.body.limit)||25
     , offset = parseInt(req.body.offset)||0
     , query = unescape(req.body.query)
+    , strict = unescape(req.body.strict)
 
     let $find = {"pgn" : { $exists: true, $ne: null }}
-
     if(query.length){
       $find.$or = []
       if(query.match(/^(\d)\. /g)) {
         $find.$or.push({"pgn": {'$regex' : query, '$options' : 'i'}})
       } else {
-        $find.$or.push({"date": {'$regex' : query, '$options' : 'i'}})        
-        query.split(' ').forEach((word) => {
-          $find.$or.push({"white": {'$regex' : word, '$options' : 'i'}})
-          $find.$or.push({"black": {'$regex' : word, '$options' : 'i'}})
-          $find.$or.push({"event": {'$regex' : word, '$options' : 'i'}})
-          $find.$or.push({"site": {'$regex' : word, '$options' : 'i'}})
-        }) 
+        if (strict === '1') {
+          $find.$or.push({"white": query})
+          $find.$or.push({"black": query})
+        } else {
+          $find.$or.push({"date": {'$regex' : query, '$options' : 'i'}})        
+          query.split(' ').forEach((word) => {
+            $find.$or.push({"white": {'$regex' : word, '$options' : 'i'}})
+            $find.$or.push({"black": {'$regex' : word, '$options' : 'i'}})
+            $find.$or.push({"event": {'$regex' : word, '$options' : 'i'}})
+            $find.$or.push({"site": {'$regex' : word, '$options' : 'i'}})
+          }) 
+        }
       }
     }
 
@@ -280,6 +283,8 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
   })
 
   io.on('connection', function(socket){ //join room on connect
+
+    
     socket.on('disconnect', function() {
       console.log("disconnect")
       for(var i = 0; i < playersIdle.length; i++ ){
@@ -330,7 +335,7 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     socket.on('preferences', function(data) {
       var exists = false
       for(var i = 0; i < playersIdle.length; i++ ){
-        if(playersIdle[i].code === data.nick && playersIdle[i].socket != socket.id){
+        if(playersIdle[i].code === data.code && playersIdle[i].socket != socket.id){
           exists = true
         }
       }
@@ -383,9 +388,10 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
     })
 
     socket.on('lobby_leave', function(data) {
-      for(var i = 0; i < playersIdle.length; i++ ){
-        if(playersIdle[i].code === data.code){
-          console.log(data.code + " leaves")
+      console.log(data.code + ' leaves?')
+      for (var i = 0; i < playersIdle.length; i++ ) {
+        if (playersIdle[i].code === data.code) {
+          console.log(data.code + ' leaves')
           playersIdle.splice(i, 1)
         }
       }
