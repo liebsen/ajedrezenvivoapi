@@ -90,6 +90,8 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
       white: req.body.white,
       black: req.body.black,
       event: 'Juego online',
+      whiteflag: req.body.whiteflag,
+      blackflag: req.body.blackflag,
       site: 'AjedrezEV',
       date: moment().format('YYYY.MM.DD HH:mm'),
       orientation: req.body.orientation,
