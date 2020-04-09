@@ -68,7 +68,7 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
       blackflag: req.body.blackflag,
       minutes: req.body.minutes,
       compensation: req.body.compensation,
-      date:moment().utc().format('YYYY.MM.DD HH:MM'),
+      date:moment().utc().format('YYYY.MM.DD HH:mm'),
       event: 'Juego online',
       broadcast: true,
       views: 0
@@ -102,7 +102,7 @@ mongodb.MongoClient.connect(mongo_url, { useUnifiedTopology: true, useNewUrlPars
         console.log(err)
         return res.json({ status : 'error', message : 'Could not create game'})
       } else {
-        return res.json({ status : 'success', id: response.ops[0]._id})
+        return res.json({ status : 'success', data: response.ops[0]})
       }
     })
   })
